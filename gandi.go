@@ -21,7 +21,6 @@ type Driver struct {
 	ApiKey         string
 	Url            string
 	VmID           int
-	VmName         string
 	Image          string
 	IPAddress      string
 	Datacenter     string
@@ -201,7 +200,7 @@ func (d *Driver) Create() error {
 	}
 	vmReq := VmCreateRequest{
 		DcId:       dc.Id,
-		Hostname:   d.VmName,
+		Hostname:   d.MachineName,
 		Memory:     512,
 		Cores:      1,
 		IpVersion:  4,
@@ -209,7 +208,7 @@ func (d *Driver) Create() error {
 		RunCommand: "apt-get install -y sudo && curl -sSL https://get.docker.com/ | sh",
 	}
 	diskReq := DiskCreateRequest{
-		Name: d.VmName,
+		Name: d.MachineName,
 		DcId: dc.Id,
 		Size: 5120,
 	}
@@ -221,7 +220,7 @@ func (d *Driver) Create() error {
 	if err := d.waitForOp(res[2].Id); err != nil {
 		return err
 	}
-	vm, err := d.vmByName(d.VmName)
+	vm, err := d.vmByName(d.MachineName)
 	if err != nil {
 		return err
 	}
