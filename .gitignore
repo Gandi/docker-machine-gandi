@@ -1,0 +1,5 @@
+docker-machine-gandi
+build
+dist
+release
+*.gz

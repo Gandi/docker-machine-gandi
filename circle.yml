@@ -1,0 +1,30 @@
+machine:
+  environment:
+    IMPORT_PATH: "github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
+
+dependencies:
+  pre:
+    - go version
+    - mkdir -p "$GOPATH/src/$IMPORT_PATH"
+    - rsync -azC --delete ./ "$GOPATH/src/$IMPORT_PATH/"
+    - test -d "$GOPATH/src/github.com/docker/" && rm -rf "$GOPATH/src/github.com/docker" || true
+    - test -d /home/ubuntu/.go_workspace/src/github.com/docker/ && rm -rf /home/ubuntu/.go_workspace/src/github.com/docker || true
+  override:
+    - make get-deps
+    - ls /usr/local/go_workspace/src/github.com
+    - ls /home/ubuntu/.go_workspace/src/github.com
+    - git --git-dir=/home/ubuntu/.go_workspace/src/github.com/docker/machine/.git --work-tree=/home/ubuntu/.go_workspace/src/github.com/docker/machine checkout tags/v0.5.1
+    - make build
+  post:
+    - cp build/* $CIRCLE_ARTIFACTS
+
+test:
+  override:
+    - git describe --abbrev=0 --tags
+    - /bin/true
+
+deployment:
+  release:
+    branch: release
+    commands:
+      - make release
