@@ -36,5 +36,8 @@ Grab your API key from the [Gandi admin](https://www.gandi.net/admin/api_key) an
 Command line flags:
 
  - `--gandi-api-key`: **required** Your Gandi API key.
- - `--gandi-ssh-user`: SSH username for the new VPS
- - `--gandi-datacenter`: Datacenter where machine will be created.
+ - `--gandi-image`: Image to use to create machine, default Ubuntu 14.04 64 bits LTS (HVM).
+ - `--gandi-datacenter`: Datacenter where machine will be created, default Bissen.
+ - `--gandi-memory`: machine memory size in MB, default 512.
+ - `--gandi-core`: Number of cores for the machine, default 1.
+ - `--gandi-url`: url to connect to.

@@ -22,6 +22,8 @@ type Driver struct {
 	Image          string
 	IPAddress      string
 	Datacenter     string
+	Memory         int
+	Core           int
 	storePath      string
 	CaCertPath     string
 	PrivateKeyPath string
@@ -34,6 +36,8 @@ const (
 	defaultImage      = "Ubuntu 14.04 64 bits LTS (HVM)"
 	defaultDatacenter = "Bissen"
 	defaultUrl        = "https://rpc.gandi.net/xmlrpc/"
+	defaultMemory     = 512
+	defaultCore       = 1
 )
 
 // GetCreateFlags registers the flags this driver adds to
@@ -53,7 +57,7 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 		},
 		mcnflag.StringFlag{
 			EnvVar: "GANDI_DATACENTER",
-			Name:   "gandi-dc",
+			Name:   "gandi-datacenter",
 			Usage:  "Gandi datacenter",
 			Value:  defaultDatacenter,
 		},
@@ -63,6 +67,16 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Usage:  "Gandi Api url",
 			Value:  defaultUrl,
 		},
+		mcnflag.IntFlag{
+			Name:  "gandi-memory",
+			Usage: "Memory in MB for gandi machine",
+			Value: defaultMemory,
+		},
+		mcnflag.IntFlag{
+			Name:  "gandi-core",
+			Usage: "Number of cores for gandi machine",
+			Value: defaultCore,
+		},
 	}
 }
 
@@ -70,8 +84,10 @@ func (d *Driver) SetConfigFromFlags(flags drivers.DriverOptions) error {
 
 	d.ApiKey = flags.String("gandi-api-key")
 	d.Image = flags.String("gandi-image")
-	d.Datacenter = flags.String("gandi-dc")
+	d.Datacenter = flags.String("gandi-datacenter")
 	d.Url = flags.String("gandi-url")
+	d.Memory = flags.Int("gandi-memory")
+	d.Core = flags.Int("gandi-core")
 
 	if d.ApiKey == "" {
 		return fmt.Errorf("gandi driver requires the -gandi-api-key option")
@@ -181,7 +197,7 @@ func (d *Driver) waitForOp(op int) error {
 		}
 		if res.Status != "BILL" && res.Status != "WAIT" && res.Status != "RUN" {
 			log.Errorf("Error waiting for operation: %d\n", op)
-			return errors.New(fmt.Sprintf("Bad operation: %d", op))
+			return errors.New(fmt.Sprintf("Bad operation status for %d : %s", op, res.Status))
 		}
 	}
 	return nil
@@ -203,11 +219,12 @@ func (d *Driver) Create() error {
 	if err != nil {
 		return err
 	}
+
 	vmReq := VmCreateRequest{
 		DcId:       dc.Id,
 		Hostname:   d.MachineName,
-		Memory:     512,
-		Cores:      1,
+		Memory:     d.Memory,
+		Cores:      d.Core,
 		IpVersion:  4,
 		SshKey:     sshKey,
 		RunCommand: "apt-get install -y sudo",
