@@ -12,7 +12,7 @@ parent="smn_machine_drivers"
 
 This plugin adds support for [Gandi](https://www.gandi.net/) cloud instances to the `docker-machine` command line tool.
 
-[![CircleCI](https://img.shields.io/circleci/project/gandi/docker-machine-gandi.svg)](https://circleci.com/gh/gandi/docker-machine-gandi/)
+<!-- [![CircleCI](https://img.shields.io/circleci/project/gandi/docker-machine-gandi.svg)](https://circleci.com/gh/gandi/docker-machine-gandi/) -->
 
 ## Installation
 
@@ -28,7 +28,10 @@ Grab your API key from the [Gandi admin](https://www.gandi.net/admin/api_key) an
 
 **Example for creating a new machine running default Ubuntu 14.04:**
 
-    docker-machine create --driver gandi --gandi-api-key=abc123 ubuntu-machine
+    docker-machine create --engine-storage-driver devicemapper \
+                          --driver gandi \
+                          --gandi-api-key=abc123 \
+                          ubuntu-machine
 
 Command line flags:
 

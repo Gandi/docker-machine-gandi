@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"path/filepath"
 	"time"
 
 	"github.com/docker/machine/libmachine/drivers"
@@ -17,7 +16,6 @@ import (
 
 type Driver struct {
 	*drivers.BaseDriver
-	MachineName    string
 	ApiKey         string
 	Url            string
 	VmID           int
@@ -99,6 +97,13 @@ func (d *Driver) DriverName() string {
 
 func (d *Driver) GetSSHHostname() (string, error) {
 	return d.GetIP()
+}
+
+func (d *Driver) GetIP() (string, error) {
+	if d.IPAddress == "" || d.IPAddress == "0" {
+		return "", fmt.Errorf("IP address is not set")
+	}
+	return d.IPAddress, nil
 }
 
 func (d *Driver) PreCreateCheck() error {
@@ -205,7 +210,7 @@ func (d *Driver) Create() error {
 		Cores:      1,
 		IpVersion:  4,
 		SshKey:     sshKey,
-		RunCommand: "apt-get install -y sudo && curl -sSL https://get.docker.com/ | sh",
+		RunCommand: "apt-get install -y sudo",
 	}
 	diskReq := DiskCreateRequest{
 		Name: d.MachineName,
@@ -297,6 +302,8 @@ func (d *Driver) Remove() error {
 			return err
 		}
 	}
+
+	log.Infof("Deleting Gandi server...")
 	params := []interface{}{d.ApiKey, d.VmID}
 	res := OperationInfo{}
 	err = d.getClient().Call("hosting.vm.delete", params, &res)
@@ -335,7 +342,7 @@ func (d *Driver) getClient() *xmlrpc.Client {
 }
 
 func (d *Driver) createSSHKey() (string, error) {
-	if err := ssh.GenerateSSHKey(d.sshKeyPath()); err != nil {
+	if err := ssh.GenerateSSHKey(d.GetSSHKeyPath()); err != nil {
 		return "", err
 	}
 
@@ -347,10 +354,6 @@ func (d *Driver) createSSHKey() (string, error) {
 	return string(publicKey), nil
 }
 
-func (d *Driver) sshKeyPath() string {
-	return filepath.Join(d.storePath, "id_rsa")
-}
-
 func (d *Driver) publicSSHKeyPath() string {
-	return d.sshKeyPath() + ".pub"
+	return d.GetSSHKeyPath() + ".pub"
 }
