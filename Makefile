@@ -46,6 +46,7 @@ get-deps:
 	go get golang.org/x/crypto/ssh/terminal
 	go get github.com/Azure/go-ansiterm
 	go get github.com/Sirupsen/logrus
+	go get github.com/gandi/docker-machine-gandi
 
 check-gofmt:
 	if [ -n "$(shell gofmt -l .)" ]; then \
