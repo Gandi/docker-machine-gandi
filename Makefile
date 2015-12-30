@@ -40,7 +40,6 @@ get-deps:
 	go get github.com/tcnksm/ghr
 	go get github.com/tools/godep
 	go get github.com/ChimeraCoder/tokenbucket
-	go get github.com/JamesClonk/gandi
 	go get github.com/docker/machine
 	go get github.com/docker/docker/pkg/term
 	go get golang.org/x/crypto/ssh
