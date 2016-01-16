@@ -192,6 +192,27 @@ func (d *Driver) userImageByName(name string, zone_id int) (DiskInfo, error) {
 	return res[0], nil
 }
 
+func (d *Driver) getSysDiskId(name string, zone_id int) (int, error) {
+	var sysDiskId = 0
+
+	image, err := d.imageByName(name, zone_id)
+	if err != nil {
+		return 0, err
+	}
+
+	if image.DiskId != 0 {
+		sysDiskId = image.DiskId
+	} else {
+		// Find user image
+		disk, err := d.userImageByName(name, zone_id)
+		if err != nil {
+			return 0, err
+		}
+		sysDiskId = disk.Id
+	}
+	return sysDiskId, nil
+}
+
 func (d *Driver) waitForOp(op int) error {
 	var res = OperationInfo{}
 	params := []interface{}{d.ApiKey, op}
@@ -228,21 +249,9 @@ func (d *Driver) Create() error {
 		return err
 	}
 
-	image, err := d.imageByName(d.Image, dc.Id)
+	sysDiskId, err := d.getSysDiskId(d.Image, dc.Id)
 	if err != nil {
 		return err
-	}
-
-	var sysDiskId = 0
-	if image.DiskId != 0 {
-		sysDiskId = image.DiskId
-	} else {
-		// Find user image
-		disk, err := d.userImageByName(d.Image, dc.Id)
-		if err != nil {
-			return err
-		}
-		sysDiskId = disk.Id
 	}
 
 	vmReq := VmCreateRequest{
