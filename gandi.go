@@ -34,7 +34,7 @@ type Driver struct {
 const (
 	dockerConfigDir   = "/etc/docker"
 	defaultImage      = "Ubuntu 14.04 64 bits LTS (HVM)"
-	defaultDatacenter = "Bissen"
+	defaultDatacenter = "LU-BI1"
 	defaultUrl        = "https://rpc.gandi.net/xmlrpc/"
 	defaultMemory     = 512
 	defaultCore       = 1
@@ -151,10 +151,10 @@ func (d *Driver) vmByName(name string) (VmInfo, error) {
 	return d.vmById(res[0].Id)
 }
 
-func (d *Driver) datacenterByName(name string) (DatacenterInfo,
+func (d *Driver) datacenterByCode(code string) (DatacenterInfo,
 	error) {
 	var res = []DatacenterInfo{}
-	var filter = map[string]string{"name": name}
+	var filter = map[string]string{"dc_code": code}
 	params := []interface{}{d.ApiKey, filter}
 	if err := d.getClient().Call("hosting.datacenter.list", params, &res); err != nil {
 		fmt.Printf("err : %v", err)
@@ -210,7 +210,7 @@ func (d *Driver) Create() error {
 	}
 
 	log.Infof("Creating Gandi server...")
-	dc, err := d.datacenterByName(d.Datacenter)
+	dc, err := d.datacenterByCode(d.Datacenter)
 	if err != nil {
 		return err
 	}
