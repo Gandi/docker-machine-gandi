@@ -174,7 +174,20 @@ func (d *Driver) imageByName(name string, zone_id int) (ImageInfo, error) {
 		return ImageInfo{}, err
 	}
 	if len(res) != 1 {
-		return ImageInfo{}, errors.New("Image not found")
+		return ImageInfo{}, nil
+	}
+	return res[0], nil
+}
+
+func (d *Driver) userImageByName(name string, zone_id int) (DiskInfo, error) {
+	var res = []DiskInfo{}
+	var filter = DiskFilter{Name: name, DcId: zone_id}
+	params := []interface{}{d.ApiKey, filter}
+	if err := d.getClient().Call("hosting.disk.list", params, &res); err != nil {
+		return DiskInfo{}, err
+	}
+	if len(res) != 1 {
+		return DiskInfo{}, errors.New("User Image not found")
 	}
 	return res[0], nil
 }
@@ -220,6 +233,18 @@ func (d *Driver) Create() error {
 		return err
 	}
 
+	var sysDiskId = 0
+	if image.DiskId != 0 {
+		sysDiskId = image.DiskId
+	} else {
+		// Find user image
+		disk, err := d.userImageByName(d.Image, dc.Id)
+		if err != nil {
+			return err
+		}
+		sysDiskId = disk.Id
+	}
+
 	vmReq := VmCreateRequest{
 		DcId:       dc.Id,
 		Hostname:   d.MachineName,
@@ -235,7 +260,7 @@ func (d *Driver) Create() error {
 		Size: 5120,
 	}
 	var res = []OperationInfo{}
-	params := []interface{}{d.ApiKey, vmReq, diskReq, image.DiskId}
+	params := []interface{}{d.ApiKey, vmReq, diskReq, sysDiskId}
 	if err := d.getClient().Call("hosting.vm.create_from", params, &res); err != nil {
 		return err
 	}
