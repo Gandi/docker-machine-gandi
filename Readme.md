@@ -25,10 +25,11 @@ Extract the archive and copy the binary to a folder located in your `PATH` and m
 
 Grab your API key from the [Gandi admin](https://www.gandi.net/admin/api_key) and pass that to `docker-machine create` with the `--gandi-api-key` option.
 
+Note that Gandi's [HVM](https://wiki.gandi.net/en/iaas/references/server/hvm) platform boots your servers with Linux kernel 3.18 by default, so you should choose the ``overlay`` storage driver instead of ``aufs``. You can also [create custom images](https://wiki.gandi.net/en/iaas/references/images) and boot with the kernel of your choice.
 
-**Example for creating a new machine running default Ubuntu 14.04:**
+Example with the default Ubuntu 14.04 LTS image with the ``overlay`` storage driver: 
 
-    docker-machine create --engine-storage-driver devicemapper \
+    docker-machine create --engine-storage-driver overlay \
                           --driver gandi \
                           --gandi-api-key=abc123 \
                           ubuntu-machine
