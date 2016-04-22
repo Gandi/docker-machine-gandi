@@ -36,6 +36,18 @@ type DiskCreateRequest struct {
 	Size int    `xmlrpc:"size"`
 }
 
+type DiskInfo struct {
+	DcId int    `xmlrpc:"datacenter_id"`
+	Name string `xmlrpc:"name"`
+	Size int    `xmlrpc:"size"`
+	Id   int    `xmlrpc:"id"`
+}
+
+type DiskFilter struct {
+	Name string `xmlrpc:"name"`
+	DcId int    `xmlrpc:"datacenter_id"`
+}
+
 type DatacenterInfo struct {
 	Id   int    `xmlrpc:"id"`
 	Name string `xmlrpc:"name"`
