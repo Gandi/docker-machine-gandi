@@ -33,7 +33,7 @@ type Driver struct {
 
 const (
 	dockerConfigDir   = "/etc/docker"
-	defaultImage      = "Ubuntu 14.04 64 bits LTS (HVM)"
+	defaultImage      = "Ubuntu 16.04 64 bits LTS (HVM)"
 	defaultDatacenter = "LU-BI1"
 	defaultUrl        = "https://rpc.gandi.net/xmlrpc/"
 	defaultMemory     = 512

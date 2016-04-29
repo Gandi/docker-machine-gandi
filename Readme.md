@@ -23,22 +23,22 @@ Extract the archive and copy the binary to a folder located in your `PATH` and m
 
 ## Usage instructions
 
-Grab your API key from the [Gandi admin](https://www.gandi.net/admin/api_key) and pass that to `docker-machine create` with the `--gandi-api-key` option.
+Grab your API key from the [Gandi admin](https://www.gandi.net/admin/api_key) and pass it to `docker-machine create` with the `--gandi-api-key` option.
 
-Note that Gandi's [HVM](https://wiki.gandi.net/en/iaas/references/server/hvm) platform boots your servers with Linux kernel 3.18 by default, so you should choose the ``overlay`` storage driver instead of ``aufs``. You can also [create custom images](https://wiki.gandi.net/en/iaas/references/images) and boot with the kernel of your choice.
+### Example
 
-Example with the default Ubuntu 14.04 LTS image with the ``overlay`` storage driver: 
+    $ docker-machine create --driver gandi \
+                            --gandi-api-key=abc123 \
+                            ubuntu-machine
 
-    docker-machine create --engine-storage-driver overlay \
-                          --driver gandi \
-                          --gandi-api-key=abc123 \
-                          ubuntu-machine
+[Read more about Docker support on Gandi servers](https://wiki.gandi.net/iaas/references/server/docker).
 
-Command line flags:
+### Command line flags:
 
  - `--gandi-api-key`: **required** Your Gandi API key.
- - `--gandi-image`: Image to use to create machine, default Ubuntu 14.04 64 bits LTS (HVM).
- - `--gandi-datacenter`: Datacenter where machine will be created, default Bissen.
- - `--gandi-memory`: machine memory size in MB, default 512.
- - `--gandi-core`: Number of cores for the machine, default 1.
- - `--gandi-url`: url to connect to.
+ - `--gandi-image`: Image used to create the machine. Default is "Ubuntu 16.04 64 bits LTS (HVM)".
+ - `--gandi-datacenter`: Datacenter where machine will be created. Default is Bissen, Luxembourg (LU-BI1).
+ - `--gandi-memory`: Memory size in MB. Default is 512 MB.
+ - `--gandi-core`: Number of cores for the machine. Default is 1 CPU core.
+ - `--gandi-url`: API url to connect to. Default is the production endpoint URL.
+
